@@ -1,5 +1,192 @@
 # ⚒ Spring Class
 
+### 제어 역전(Inversion of Control, IoC)
+
+- 객체의 생성과 제어(생명주기, 의존성 주입 등)를 개발자가 하지 않고,
+  프레임워크나 컨테이너가 대신 담당하는 설계 원칙
+
+
+- "개발자가 직접 객체를 생성하고 관리하는 것이 아니라, 외부에서 객체를 주입받는다.”
+
+
+- 전통적인 방식에서는 개발자가 객체를 직접 생성하고 사용하는 흐름을 제어했었음.
+
+
+- 하지만 IoC에서는 **객체의 제어권이 프레임워크**(예: 스프링 컨테이너)로 넘어감.
+  그래서 제어의 흐름이 '개발자 → 프레임워크'로 역전되었기 때문에 "제어 역전"이라 함
+
+
+- IoC를 구현하는 가장 일반적인 방법은 DI(Dependency Injection)
+  - 스프링에서는 **생성자 주입**, 세터 주입, 필드 주입 방법으로 DI 지원
+  - 스프링에서는 **@Component, @Autowired, @Configuration, @Bean** 등을 통해 IoC를 구성
+  - 스프링이 객체들을 스캔하고 자동으로 주입 → 개발자가 제어하지 않음 → 제어 역전
+
+
+```java
+// MemberService가 MemberRepository를 직접 생성하고 사용
+// 이 구조는 결합도가 높고 테스트나 변경이 어려움.
+
+public class MemberService {
+    private MemberRepository repository;
+
+    public MemberService() {
+        this.repository = new MemberRepository(); // 직접 생성
+    }
+
+    public void joinMember(String name) {
+        repository.save(name);
+    }
+}
+```
+
+```java
+// 객체 생성은 외부(컨테이너)가 담당
+// MemberService는 자신이 사용할 MemberRepository를 주입 받음
+// 결합도 낮고 테스트 용이
+
+public class MemberService {
+    private final MemberRepository repository;
+
+    // 생성자 주입 (의존성 주입 - DI)
+    public MemberService(MemberRepository repository) {
+        this.repository = repository;
+    }
+
+    public void joinMember(String name) {
+        repository.save(name);
+    }
+}
+```
+
+```java
+@Component
+public class MemoryMemberRepository implements MemberRepository {
+    @Override
+    public void save(String name) {
+        System.out.println("회원 저장: " + name);
+    }
+}
+
+@Service
+public class MemberService {
+    private final MemberRepository repository;
+
+    @Autowired
+    public MemberService(MemberRepository repository) {
+        this.repository = repository;
+    }
+}
+```
+
+**제어 역전의 장점**
+
+| **장점** | **설명** |
+| --- | --- |
+| 낮은 결합도 | 객체 간 의존성이 줄어들어 유지보수 용이 |
+| 테스트 용이 | 테스트 시 Mock 객체를 쉽게 주입 가능 |
+| 재사용성 향상 | 다양한 구현체를 쉽게 교체 가능 |
+| 유연한 구조 | OCP 원칙(개방-폐쇄 원칙)을 지키기 쉬움 |
+
+### AOP
+
+- 관점 지향 프로그래밍
+- 공통 관심 사항을 핵심 비즈니스 로직과 분리하여 모듈화하는 프로그래밍 패러다임. 대표적으로
+  **로깅**, **보안**, **트랜잭션**, **성능 측정**등의 기능이 이에 해당
+- 핵심 로직과는 **다른 부가적인 로직**을 관점으로 분리하여 코드 중복을 줄이고 유지보수를 쉽게 함
+
+
+### 스프링 프레임워크 모듈
+
+- 자바 기반의 엔터프라이즈 애플리케이션을 개발하기 위한 경량 애플리케이션 프레임워크
+- 스프링은 모듈화된 구조를 갖고 있으며, 각 모듈은 특정 기능을 담당. 필요한 모듈만 선택해서
+  사용할 수 있으며, 유연하고 확장성이 뛰어남
+
+**Core Container (핵심 컨테이너)**
+
+| 모듈 | 설명 |
+| --- | --- |
+| **Core** | IoC(Inversion of Control), DI(Dependency Injection) 기능의 기반을 제공 |
+| **Beans** | 스프링 빈 설정, 생성, 주입, 생명주기 관리 |
+| **Context** | BeanFactory를 확장한 ApplicationContext 제공 (국제화, 이벤트 전달 등 지원) |
+| **SpEL (Spring Expression Language)** | 런타임에 객체 그래프를 조회하거나 조작할 수 있는 표현식 언어 |
+
+**Data Access / Integration** : 데이터 접근과 관련된 모듈
+
+**Web (Spring Web) :** DispatcherServlet 중심의 요청 처리, RESTful API, Thymeleaf, JSP 등 다양한 뷰 기술과 연동 가능
+
+### Spring Boot Starter
+
+- Starter는 Spring Boot에서 제공하는 기능별 의존성 패키지 모음
+- 즉, 어떤 기능을 사용하고 싶을 때 관련된 라이브러리들을 일일이 설정할 필요 없이,
+  하나의 starter만 추가하면 자동으로 필요한 라이브러리가 함께 추가됨
+
+| **Starter 이름** | **설명** |
+| --- | --- |
+| `spring-boot-starter` | 기본적인 의존성 (로깅, 코어 등) |
+| `spring-boot-starter-web` | 웹 애플리케이션 (Spring MVC + 내장 Tomcat) |
+| `spring-boot-starter-data-jpa` | JPA, Hibernate 기반 ORM |
+| `spring-boot-starter-security` | Spring Security 기반 인증/인가 |
+| `spring-boot-starter-thymeleaf` | Thymeleaf 템플릿 엔진 |
+| `spring-boot-starter-test` | JUnit, Mockito 등 테스트 도구 모음 |
+| `spring-boot-starter-aop` | AOP 관련 기능 (AspectJ 등) |
+| `spring-boot-starter-actuator` | 애플리케이션 모니터링 및 헬스 체크 |
+| `spring-boot-starter-validation` | Bean Validation (JSR 380) 지원 |
+
+### 빈약한 도메인 모델 (Anemic Domain Model)
+
+- **데이터베이스 중심 설계 경향**
+  - 많은 개발자들이 DB 테이블을 먼저 설계한 다음,
+  - 그 구조에 맞춰 Entity 클래스를 만들고,
+  - 그 Entity를 중심으로 로직을 작성하다 보니...
+  - 비즈니스 로직이 점점 DB 구조에 종속되고,
+  - 도메인 모델(Entity) 안에는 데이터만 있고, 행동(로직)은 없음
+
+- **핵심 도메인 객체인데도, 자기 일을 못하고 그냥 값만 들고 있는 상태**
+  - **Order** 는 그저 데이터를 담는 **DTO 같은 존재** 일 뿐
+
+
+```java
+// Entity (데이터만 있음)
+public class Order {
+    private Long id;
+    private int quantity;
+    private int price;
+
+    // getter/setter만 있음
+}
+```
+
+```java
+// Service에서 모든 로직 처리
+public class OrderService {
+    public void placeOrder(Order order) {
+        // 수량 계산, 가격 계산 등 모든 로직이 여기 있음
+    }
+}
+```
+
+- **이 문제를 해결하려는 아키텍처는?**
+  - → **도메인 주도 설계 (DDD: Domain-Driven Design)**
+  - DDD는 도메인 모델에 로직을 집중시켜 풍부한 도메인 모델을 만들도록 유도
+
+- **풍부한 도메인 모델 (Rich Domain Model)**
+
+```java
+// Order 객체가 스스로 자신의 역할(자기 일) 수행
+public class Order {
+	private int quantity;
+	private int price;
+	
+	public int calculateTotalPrice() {
+	    return quantity * price;
+	}
+	
+	public void cancel() {
+	    // 주문 취소 로직
+	}
+}
+```
+
 ## 🧱 Layered Architecture
 
 > 소프트웨어 시스템을 **논리적인 계층(Layer)** 으로 분리하여 구성하는 가장 일반적이고 전통적인 아키텍처 패턴 중 하나
@@ -957,3 +1144,11 @@ POST API는 **서버에 새로운 리소스를 생성할 때** 사용됩니다.
 - 삭제 성공 시:
   - `200 OK`: 삭제된 리소스 정보를 반환하는 경우
   - `204 No Content`: 본문 없이 상태 코드만 반환 (일반적)
+
+___
+
+<br>
+<br>
+<br>
+
+# 

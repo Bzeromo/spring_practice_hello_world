@@ -1,7 +1,5 @@
 package com.example.helloworld.user.domain;
 
-//@Getter
-//@Setter
 public class User {
     private String userId;
     private String password;

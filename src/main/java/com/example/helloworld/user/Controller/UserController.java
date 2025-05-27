@@ -1,6 +1,7 @@
 package com.example.helloworld.user.Controller;
 
 import com.example.helloworld.user.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
@@ -29,6 +31,7 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
+        log.info("getAllUsers 호출");
         return ResponseEntity.ok(users);
     }
 
@@ -39,6 +42,8 @@ public class UserController {
      */
     @GetMapping("/{userid}")
     public ResponseEntity<User> getUserById(@PathVariable String userid) {
+        log.info("getUserById 호출");
+
         Optional<User> userOpt = users.stream()
                 .filter(user -> user.getUserId().equals(userid))
                 .findFirst();
@@ -53,6 +58,8 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
+        log.info("createUser 호출");
+
         users.add(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
@@ -64,6 +71,7 @@ public class UserController {
      */
     @PutMapping("/{userid}")
     public ResponseEntity<User> modifyUser(@PathVariable String userid, @RequestBody User user) {
+        log.info("modifyUser 호출");
         Optional<User> userOpt = users.stream()
                 .filter(usr -> usr.getUserId().equals(userid))
                 .findFirst();
@@ -86,6 +94,7 @@ public class UserController {
      */
     @PatchMapping("/{userid}")
     public ResponseEntity<User> patchUser(@PathVariable String userid, @RequestBody User user) {
+        log.info("patchUser 호출");
         Optional<User> userOpt = users.stream()
                 .filter(usr -> usr.getUserId().equals(userid))
                 .findFirst();
@@ -111,6 +120,7 @@ public class UserController {
      */
     @DeleteMapping("/{userid}")
     public ResponseEntity<User> deleteUser(@PathVariable String userid) {
+        log.info("deleteUser 호출");
         boolean removed = users.removeIf(
                 user -> user.getUserId().equals(userid));
 
