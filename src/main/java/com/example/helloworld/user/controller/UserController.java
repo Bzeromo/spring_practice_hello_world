@@ -1,4 +1,4 @@
-package com.example.helloworld.user.Controller;
+package com.example.helloworld.user.controller;
 
 import com.example.helloworld.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
