@@ -1737,3 +1737,186 @@ UserDto findUserById(int id);
 >📌 운영 환경에서는 Flyway/Liquibase를 **표준 방식으로 추천**
 
 
+---
+
+## 🧪 테스트 코드 작성 이유
+
+- **버그 조기 발견 및 수정**, 코드 품질 향상 및 **유지보수 용이성** 증가
+- **리팩토링 및 기능 추가 시 안정성 확보**
+- **명세 문서 역할** 수행
+- **빠른 피드백**, 협업 효율 증진
+- **CI/CD 파이프라인의 핵심**
+- **TDD (Test-Driven Development)** 기반의 설계 개선
+
+---
+
+## ✅ 스프링 부트에서의 테스트 유형
+
+### 🔹 단위 테스트(Unit Test)
+
+- 특정 모듈이나 클래스, 메서드 등 **작은 단위의 기능 테스트**
+- 스프링 컨테이너의 도움 없이 `Mock` 객체(`Mockito` 등)를 사용하여 **의존성을 격리**하고 **순수 Java 코드로 테스트**
+- 예시: `서비스 레이어의 비즈니스 로직`, `유틸리티 클래스` 등
+
+### 🔹 통합 테스트(Integration Test)
+
+- 여러 모듈이 연동되는 상황 테스트 → **애플리케이션 정상 작동 여부 확인**
+- `@SpringBootTest` 어노테이션을 통해 실제 **스프링 컨테이너 실행**, **DI(의존성 주입)** 기반 테스트 수행
+
+📌 예시:
+- 컨트롤러 → 서비스 → 리포지토리 계층 간의 연동
+- DB 연동 테스트 (`@DataJpaTest`)
+- 외부 API 연동 테스트
+
+### 🧪 테스트 대상
+
+- **공개 API**: 클래스의 공개 메서드 동작 테스트
+- **경계 조건**: `null` 값, 빈 값, 최대/최소값 등 **경계 상황 테스트**
+- **예외 처리**: 예상되는 예외가 **정상적으로 발생하는지 확인**
+- **비즈니스 로직**: 핵심 **도메인 규칙이 의도한 대로 작동하는지 검증**
+
+---
+
+### ✅ 스프링 부트에서의 TDD 지원
+
+- `spring-boot-starter-test` 스타터  
+  → 프로젝트 생성 시 **핵심 테스트 라이브러리 자동 포함 및 설정**
+
+---
+
+#### 📦 포함 라이브러리 구성
+
+- **JUnit 5 (Jupiter)**  
+  자바 표준 테스트 프레임워크  
+  (💡 스프링 부트 2.2 이상에서 기본 사용)
+
+- **Spring Test & Spring Boot Test**  
+  스프링 컨텍스트 로딩 및 의존성 주입 지원  
+  `@WebMvcTest`, `@DataJpaTest` 등 다양한 테스트 구성 제공
+
+- **AssertJ**  
+  풍부한 단언 메서드로 **가독성 높은 테스트 코드 작성** 가능
+  ```java
+  assertThat(result).isEqualTo(expected);
+  ```
+
+- **Hamcrest**  
+  `Matcher` 객체 기반의 표현식 작성
+  ```java
+  assertThat(name, is(notNullValue()));
+  ```
+
+- **Mockito**  
+  의존 객체를 **Mock 객체로 대체**하여 단위 테스트 용이
+  ```java
+  when(mockRepo.findById(1L)).thenReturn(Optional.of(user));
+  ```
+
+--- 
+
+> 🧪 테스트 자동화, 의존성 격리, 객체 주입 기반의 테스트 지원까지 **스프링 부트 TDD 환경은 강력하고 유연함**
+
+---
+
+## 🧪 Given–When–Then 패턴
+
+**BDD(행위 주도 개발)**에서 자주 사용되는 테스트 시나리오 작성 방식.  
+→ 테스트의 목적과 흐름을 명확하게 표현하여 **개발자, 기획자, QA** 등 다양한 이해관계자가 쉽게 이해하고 소통 가능
+
+---
+
+### ✅ 구조 설명
+
+- **Given (준비)**: 테스트의 사전 조건 및 환경 설정
+  ```java
+  given(userService.findById(1L)).willReturn(Optional.of(user));
+  ```
+
+- **When (행위)**: 수행하려는 동작 또는 이벤트 실행
+  ```java
+  User result = userController.getUser(1L);
+  ```
+
+- **Then (검증)**: 결과 검증 및 기대 값 확인
+  ```java
+  assertThat(result.getName()).isEqualTo("홍길동");
+  ```
+
+---
+
+### 💡 장점
+
+- **가독성과 명확성 향상**  
+  → 테스트 의도가 분명해지고, 코드 읽기 쉬움
+
+
+- **행위 중심 테스트 사고 방식**  
+  → 특정 기능보다 **유저의 시나리오 중심 테스트** 설계 가능
+
+
+- **유지보수 용이**  
+  → 테스트 구조가 명확하여 **수정·디버깅이 쉬움**
+
+## ✅ JUnit과 JUnit의 아키텍처
+
+Java 기반 단위 테스트 프레임워크인 JUnit은 테스트 실행을 위한 아키텍처를 체계적으로 제공함
+
+---
+
+### 🧱 JUnit 아키텍처 구성 요소
+
+| 구성 요소 | 설명 |
+|-----------|------|
+| **TestCase** | 테스트할 단위 기능을 정의하는 클래스. 각 테스트 메서드는 `@Test`로 표시 |
+| **Assert** | 테스트의 **결과를 검증**하는 정적 메서드 모음 (ex: `assertEquals`, `assertThrows`) |
+| **TestRunner** | 정의된 테스트 케이스를 **실행**하고 결과를 **수집/보고**하는 역할 |
+| **TestSuite** | 여러 개의 테스트 케이스를 묶어 **집합 테스트**를 구성하는 클래스 |
+| **Annotations** | `@BeforeEach`, `@AfterEach`, `@BeforeAll`, `@AfterAll` 등 **테스트 실행 흐름** 제어 |
+| **TestEngine (JUnit Platform)** | JUnit5에서 도입된 개념. Jupiter, Vintage 등 다양한 테스트 엔진을 **모듈화**하여 관리 |
+
+---
+
+### 🔍 JUnit5 기준 계층 구조
+
+```plaintext
+JUnit Platform (org.junit.platform.*)
+ ├─ TestEngine (예: JupiterEngine)
+ │   ├─ @Test, @BeforeEach, ...
+ │   ├─ Assertions
+ │   ├─ TestInstance, TestReporter, TestInfo ...
+ └─ Launcher, TestPlan 등 실행 관리 도구
+```
+
+---
+
+### 💡 예시 구조
+
+```java
+class UserServiceTest {
+
+    private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        userService = new UserService();
+    }
+
+    @Test
+    void givenValidName_whenCreateUser_thenUserCreated() {
+        User user = userService.createUser("Alice");
+
+        assertEquals("Alice", user.getName());
+    }
+}
+```
+
+---
+
+### 📌 참고
+
+- `JUnit 4`는 단일 클래스 기반 (`org.junit.Test`)
+- `JUnit 5`는 **플랫폼 + Jupiter + Vintage**로 분리된 **모듈 아키텍처** 제공
+  - **Platform**: 런타임과 IDE 통합용
+  - **Jupiter**: JUnit5의 새로운 프로그래밍 모델
+  - **Vintage**: JUnit4와의 호환성 보장
+
