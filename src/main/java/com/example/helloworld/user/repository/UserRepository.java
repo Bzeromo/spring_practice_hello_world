@@ -2,6 +2,7 @@ package com.example.helloworld.user.repository;
 
 import com.example.helloworld.user.domain.User;
 import com.example.helloworld.user.dto.FindAllUserDto;
+import com.example.helloworld.user.dto.UserCreateDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -15,4 +16,7 @@ public interface UserRepository {
 
     @Select("select * from users where userId = #{userId}")
     User findByUserId(String userId);
+
+
+    int insertUser(UserCreateDto user);
 }

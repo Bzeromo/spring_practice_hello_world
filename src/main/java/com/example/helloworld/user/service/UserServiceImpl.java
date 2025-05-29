@@ -2,6 +2,7 @@ package com.example.helloworld.user.service;
 
 import com.example.helloworld.user.domain.User;
 import com.example.helloworld.user.dto.FindAllUserDto;
+import com.example.helloworld.user.dto.UserCreateDto;
 import com.example.helloworld.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,5 +25,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User readByUserId(String userId) {
         return userRepository.findByUserId(userId);
+    }
+
+    @Override
+    public boolean newUser(UserCreateDto user) {
+        return userRepository.insertUser(user) > 0;
     }
 }
