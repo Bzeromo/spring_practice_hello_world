@@ -52,7 +52,7 @@ public class UserController3 {
     }
 
     @GetMapping("/newUser")
-    public String newUser(Model model) {
+    public String newUser() {
 
         return "views/newUser";
     }

@@ -1,15 +1,16 @@
 package com.example.helloworld.user.controller;
 
 import com.example.helloworld.user.domain.User;
+import com.example.helloworld.user.dto.UserCreateDto2;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -129,5 +130,31 @@ public class UserController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * 유저 추가 2 (유효성 검증 추가 버전)
+     * 실제로 추가되진 않으며 유효성 검증 예시를 보여주기 위함으로서 return 값 역시 넣은 매개변수 그대로임
+     * success: 201 code
+     * fail: 400 code
+     */
+    @PostMapping("/valid")
+    public ResponseEntity<?> createUser2(
+            @Valid @RequestBody UserCreateDto2 user,
+            BindingResult result) {
+        log.info("createUser2 호출 : {}", user.toString());
+        log.info("유효성 검사 메시지 : {}", result);
+
+        if(result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : result.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+                log.info("errors : {}", errors);
+            }
+
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 }
